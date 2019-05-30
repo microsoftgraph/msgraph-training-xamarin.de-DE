@@ -1,10 +1,10 @@
 <!-- markdownlint-disable MD002 MD041 -->
 
-In dieser Übung integrieren Sie Microsoft Graph in die Anwendung. Für diese Anwendung verwenden Sie die [Microsoft Graph-Client Bibliothek für .net](https://github.com/microsoftgraph/msgraph-sdk-dotnet) , um Aufrufe von Microsoft Graph zu tätigen.
+In dieser Übung werden Sie das Microsoft Graph in die Anwendung integrieren. Für diese Anwendung verwenden Sie die [Microsoft Graph-Clientbibliothek für .net](https://github.com/microsoftgraph/msgraph-sdk-dotnet) , um Anrufe an Microsoft Graph zu tätigen.
 
 ## <a name="get-calendar-events-from-outlook"></a>Abrufen von Kalenderereignissen aus Outlook
 
-Aktualisieren Sie zunächst die Datei **CalendarPage. XAML** im **GraphTutorial** -Projekt. Öffnen Sie die Datei, und ersetzen Sie Ihren Inhalt durch Folgendes.
+Aktualisieren Sie zunächst die Datei **CalendarPage. XAML** im **GraphTutorial** -Projekt. Öffnen Sie die Datei, und ersetzen Sie den Inhalt durch Folgendes.
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -50,17 +50,17 @@ protected override async void OnAppearing()
 }
 ```
 
-Überlegen Sie sich, was `OnAppearing` der Code in tut.
+Überprüfen Sie, was `OnAppearing` der Code in tut.
 
-- Die URL, die aufgerufen wird, `/v1.0/me/events`lautet.
-- Die `Select` Funktion schränkt die für jedes Ereignis zurückgegebenen Felder auf diejenigen ein, die die Ansicht tatsächlich verwendet.
-- Die `OrderBy` Funktion sortiert die Ergebnisse nach dem Datum und der Uhrzeit, zu denen Sie erstellt wurden, wobei das neueste Element zuerst angezeigt wird.
+- Die URL, die aufgerufen wird `/v1.0/me/events`.
+- Die `Select` -Funktion schränkt die für die einzelnen Ereignisse zurückgegebenen Felder auf genau diejenigen ein, die die Ansicht tatsächlich verwendet wird.
+- Die `OrderBy` -Funktion sortiert die Ergebnisse nach dem Datum und der Uhrzeit, zu der Sie erstellt wurden, wobei das letzte Element zuerst angezeigt wird.
 
-Sie können jetzt die app ausführen, sich anmelden und im Menü auf das Navigationselement **Kalender** klicken. Es sollte ein JSON-Dump der Ereignisse im Kalender des Benutzers angezeigt werden.
+Sie können nun die app ausführen, sich anmelden und im Menü auf das Navigationselement **Kalender** klicken. Es sollte ein JSON-Dump der Ereignisse im Kalender des Benutzers angezeigt werden.
 
 ## <a name="display-the-results"></a>Anzeigen der Ergebnisse
 
-Jetzt können Sie den JSON-Dump durch einen anderen ersetzen, um die Ergebnisse auf benutzerfreundliche Weise anzuzeigen. Erstellen Sie zunächst einen [bindungswert Konverter](/xamarin/xamarin-forms/xaml/xaml-basics/data-binding-basics#binding-value-converters) , um die von Microsoft Graph zurückgegebenen [dateTimeTimeZone](/graph/api/resources/datetimetimezone?view=graph-rest-1.0) -Werte in die vom Benutzer erwarteten Datums-und Uhrzeitformate umzuwandeln. Klicken Sie im **GraphTutorial** -Projekt mit der rechten Maustaste auf den Ordner **Modelle** , und wählen Sie **neu**, dann **Klasse.**... Benennen Sie die `GraphDateTimeTimeZoneConverter` Klasse, und wählen Sie **Hinzufügen**. Ersetzen Sie den gesamten Inhalt der Datei durch Folgendes.
+Nun können Sie das JSON-Dump durch etwas ersetzen, um die Ergebnisse auf eine benutzerfreundliche Weise anzuzeigen. Erstellen Sie zunächst einen [Binding-Wertkonverter](/xamarin/xamarin-forms/xaml/xaml-basics/data-binding-basics#binding-value-converters) , um die von Microsoft Graph zurückgegebenen [dateTimeTimeZone](/graph/api/resources/datetimetimezone?view=graph-rest-1.0) -Werte in die vom Benutzer erwarteten Datums-und Uhrzeitformate zu konvertieren. Klicken Sie mit der rechten Maustaste auf den Ordner **Models** im **GraphTutorial** -Projekt, und wählen Sie **Hinzufügen**und dann **Klasse...**. Nennen Sie die `GraphDateTimeTimeZoneConverter` Klasse, und wählen Sie **Hinzufügen**aus. Ersetzen Sie den gesamten Inhalt der Datei durch den folgenden Code.
 
 ```cs
 using Microsoft.Graph;
@@ -100,7 +100,7 @@ namespace GraphTutorial.Models
 }
 ```
 
-Ersetzen Sie als nächstes den gesamten Inhalt `CalendarPage.xaml` von durch Folgendes.
+Ersetzen Sie als nächstes den gesamten Inhalt `CalendarPage.xaml` durch Folgendes.
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
@@ -115,7 +115,7 @@ Ersetzen Sie als nächstes den gesamten Inhalt `CalendarPage.xaml` von durch Fol
     <ContentPage.Content>
         <StackLayout>
             <ListView x:Name="CalendarList"
-                      VerticalOptions="StartAndExpand"
+                      HasUnevenRows="true"
                       Margin="10,10,10,10">
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -144,7 +144,7 @@ Ersetzen Sie als nächstes den gesamten Inhalt `CalendarPage.xaml` von durch Fol
 </ContentPage>
 ```
 
-Dadurch wird die `Editor` durch eine `ListView`ersetzt. Die `DataTemplate` zum Rendern jedes Elements verwendete verwendet die `GraphDateTimeTimeZoneConverter` , um die `Start` and `End` -Eigenschaften des Ereignisses in eine Zeichenfolge zu konvertieren. Öffnen `CalendarPage.xaml.cs` Sie nun die folgenden Zeilen aus der `OnAppearing` -Funktion, und entfernen Sie Sie.
+Dadurch wird die `Editor` durch a `ListView`ersetzt. Der `DataTemplate` zum Rendern der einzelnen Elemente verwendete verwendet `GraphDateTimeTimeZoneConverter` , um die `Start` - `End` und-Eigenschaften des Ereignisses in eine Zeichenfolge zu konvertieren. Öffnen `CalendarPage.xaml.cs` Sie nun die folgenden Zeilen aus der `OnAppearing` -Funktion, und entfernen Sie Sie.
 
 ```cs
 // Temporary
@@ -158,6 +158,6 @@ Fügen Sie an ihrer Stelle den folgenden Code hinzu.
 CalendarList.ItemsSource = events.CurrentPage.ToList();
 ```
 
-Führen Sie die APP aus, melden Sie sich an, und klicken Sie auf das Navigationselement **Kalender** . Es sollte eine Liste der Ereignisse angezeigt werden, deren **anfangs** -und Endwerte formatiert sind. ****
+Führen Sie die APP aus, melden Sie sich an, und klicken Sie auf das Navigationselement **Kalender** . Die Liste der Ereignisse sollte angezeigt werden, wobei die Werte **Start** und **End** formatiert sind.
 
-![Screenshot der Ereignistabelle](./images/calendar-page.png)
+![Ein Screenshot der Ereignistabelle](./images/calendar-page.png)
