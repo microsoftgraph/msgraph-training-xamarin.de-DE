@@ -23,10 +23,10 @@ Bevor Sie fortfahren, installieren Sie einige zusätzliche NuGet-Pakete, die Sie
 Wählen Sie **Tools #a0 NuGet-Paket-Manager #a1-Paket-Manager-Konsole**aus. Geben Sie in der Paket-Manager-Konsole die folgenden Befehle ein.
 
 ```Powershell
-Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial
-Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial.Android
-Install-Package Microsoft.Identity.Client -Version 3.0.8 -Project GraphTutorial.iOS
-Install-Package Microsoft.Graph -Version 1.15.0 -Project GraphTutorial
+Install-Package Microsoft.Identity.Client -Version 4.7.1 -Project GraphTutorial
+Install-Package Microsoft.Identity.Client -Version 4.7.1 -Project GraphTutorial.Android
+Install-Package Microsoft.Identity.Client -Version 4.7.1 -Project GraphTutorial.iOS
+Install-Package Microsoft.Graph -Version 1.20.0 -Project GraphTutorial
 ```
 
 ## <a name="design-the-app"></a>Entwerfen der APP
@@ -447,6 +447,6 @@ namespace GraphTutorial
 }
 ```
 
-Speichern Sie alle Änderungen. Klicken Sie mit der rechten Maustaste auf das Projekt, das Sie ausführen möchten (Android, IOS oder UWP), und wählen Sie **als Startprojekt festlegen**aus. Drücken Sie **F5** , oder wählen Sie **Debug #a0 starten** des Debuggings in Visual Studio.
+Speichern Sie alle Änderungen. Klicken Sie mit der rechten Maustaste auf das Projekt, das Sie ausführen möchten (Android, IOS oder UWP), und wählen Sie **als Startprojekt festlegen**aus. Drücken Sie **F5** , oder wählen Sie **Debug #a0 starten des Debuggings** in Visual Studio.
 
 ![Screenshots der Android-, IOS-und UWP-Versionen der Anwendung](./images/welcome-page.png)

@@ -33,6 +33,12 @@ using System.Linq;
 using System.Net.Http.Headers;
 ```
 
+Ändern Sie die Deklarations Reihe der **App** -Klasse, um den Namenskonflikt für **Application**aufzulösen.
+
+```cs
+public partial class App : Xamarin.Forms.Application, INotifyPropertyChanged
+```
+
 Fügen Sie der `App` Klasse die folgenden Eigenschaften hinzu.
 
 ```cs
@@ -47,6 +53,9 @@ public static IPublicClientApplication PCA;
 
 // Microsoft Graph client
 public static GraphServiceClient GraphClient;
+
+// Microsoft Graph permissions used by app
+private readonly string[] Scopes = OAuthSettings.Scopes.Split(' ');
 ```
 
 Erstellen Sie als nächstes eine `PublicClientApplication` neue im Konstruktor der `App` Klasse.
@@ -73,36 +82,27 @@ public App()
 Aktualisieren Sie jetzt `SignIn` die-Funktion, `PublicClientApplication` um ein Zugriffstoken abzurufen. Fügen Sie den folgenden Code oberhalb `await GetUserInfo();` der Linie hinzu.
 
 ```cs
-var scopes = OAuthSettings.Scopes.Split(' ');
-
 // First, attempt silent sign in
 // If the user's information is already in the app's cache,
 // they won't have to sign in again.
-string accessToken = string.Empty;
 try
 {
     var accounts = await PCA.GetAccountsAsync();
-    if (accounts.Count() > 0)
-    {
-        var silentAuthResult = await PCA
-            .AcquireTokenSilent(scopes, accounts.FirstOrDefault())
-            .ExecuteAsync();
 
-        Debug.WriteLine("User already signed in.");
-        Debug.WriteLine($"Access token: {silentAuthResult.AccessToken}");
-        accessToken = silentAuthResult.AccessToken;
-    }
+    var silentAuthResult = await PCA
+        .AcquireTokenSilent(Scopes, accounts.FirstOrDefault())
+        .ExecuteAsync();
+
+    Debug.WriteLine("User already signed in.");
+    Debug.WriteLine($"Successful silent authentication for: {silentAuthResult.Account.Username}");
+    Debug.WriteLine($"Access token: {silentAuthResult.AccessToken}");
 }
-catch (MsalUiRequiredException)
+catch (MsalUiRequiredException msalEx)
 {
     // This exception is thrown when an interactive sign-in is required.
-    Debug.WriteLine("Silent token request failed, user needs to sign-in");
-}
-
-if (string.IsNullOrEmpty(accessToken))
-{
+    Debug.WriteLine("Silent token request failed, user needs to sign-in: " + msalEx.Message);
     // Prompt the user to sign-in
-    var interactiveRequest = PCA.AcquireTokenInteractive(scopes);
+    var interactiveRequest = PCA.AcquireTokenInteractive(Scopes);
 
     if (AuthUIParent != null)
     {
@@ -110,8 +110,13 @@ if (string.IsNullOrEmpty(accessToken))
             .WithParentActivityOrWindow(AuthUIParent);
     }
 
-    var authResult = await interactiveRequest.ExecuteAsync();
-    Debug.WriteLine($"Access Token: {authResult.AccessToken}");
+    var interactiveAuthResult = await interactiveRequest.ExecuteAsync();
+    Debug.WriteLine($"Successful interactive authentication for: {interactiveAuthResult.Account.Username}");
+    Debug.WriteLine($"Access token: {interactiveAuthResult.AccessToken}");
+}
+catch (Exception ex)
+{
+    Debug.WriteLine("Authentication failed. See exception messsage for more details: " + ex.Message);
 }
 ```
 
@@ -189,7 +194,7 @@ App.AuthUIParent = this;
 
 Bei Verwendung in einem Xamarin IOS-Projekt hat die Microsoft-Authentifizierungsbibliothek einige [spezifische Anforderungen an IOS](https://github.com/AzureAD/microsoft-authentication-library-for-dotnet/wiki/Xamarin-iOS-specifics).
 
-Zunächst müssen Sie den Schlüsselbund-Zugriff aktivieren. Erweitern Sie im Projektmappen-Explorer das Projekt **GraphTutorial. IOS** , und öffnen Sie dann die Datei entitles **. plist** . Suchen Sie nach der **Schlüsselbund** Berechtigung, und wählen Sie **Schlüsselbund aktivieren**aus. Fügen Sie in **Schlüsselbund Gruppen**einen Eintrag mit dem `com.YOUR_DOMAIN.GraphTutorial`Format hinzu.
+Zunächst müssen Sie den Schlüsselbund-Zugriff aktivieren. Erweitern Sie im Projektmappen-Explorer das Projekt **GraphTutorial. IOS** , und öffnen Sie dann die Datei **entitles. plist** . Suchen Sie nach der **Schlüsselbund** Berechtigung, und wählen Sie **Schlüsselbund aktivieren**aus. Fügen Sie in **Schlüsselbund Gruppen**einen Eintrag mit dem `com.YOUR_DOMAIN.GraphTutorial`Format hinzu.
 
 ![Screenshot der Schlüsselbund-Berechtigungskonfiguration](./images/enable-keychain-access.png)
 
@@ -241,21 +246,56 @@ Wenn Sie die Anwendung ausführen und auf die Schaltfläche **Anmelden** tippen,
 
 ## <a name="get-user-details"></a>Abrufen von Benutzer Details
 
-Aktualisieren Sie nun `SignIn` die-Funktion in **app.XAML.cs** , `GraphServiceClient`um die zu initialisieren. Fügen Sie vor der `await GetUserInfo();` Codezeile den folgenden Code hinzu.
+Fügen Sie der **App** -Klasse eine neue Funktion hinzu, `GraphServiceClient`um die zu initialisieren.
 
 ```cs
-// Initialize Graph client
-GraphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
-    async (requestMessage) =>
+private async Task InitializeGraphClientAsync()
+{
+    var currentAccounts = await PCA.GetAccountsAsync();
+    try
     {
-        var accounts = await PCA.GetAccountsAsync();
+        if (currentAccounts.Count() > 0)
+        {
+            // Initialize Graph client
+            GraphClient = new GraphServiceClient(new DelegateAuthenticationProvider(
+                async (requestMessage) =>
+                {
+                    var result = await PCA.AcquireTokenSilent(Scopes, currentAccounts.FirstOrDefault())
+                        .ExecuteAsync();
 
-        var result = await PCA.AcquireTokenSilent(scopes, accounts.FirstOrDefault())
-            .ExecuteAsync();
+                    requestMessage.Headers.Authorization =
+                        new AuthenticationHeaderValue("Bearer", result.AccessToken);
+                }));
 
-        requestMessage.Headers.Authorization =
-            new AuthenticationHeaderValue("Bearer", result.AccessToken);
-    }));
+            await GetUserInfo();
+
+            IsSignedIn = true;
+        }
+        else
+        {
+            IsSignedIn = false;
+        }
+    }
+    catch(Exception ex)
+    {
+        Debug.WriteLine(
+            $"Failed to initialized graph client. Accounts in the msal cache: {currentAccounts.Count()}. See exception message for details: {ex.Message}");
+    }
+}
+```
+
+Aktualisieren Sie nun `SignIn` die-Funktion in **app.XAML.cs** , um diese Funktion `GetUserInfo`anstelle von aufzurufen. Entfernen Sie aus der `SignIn` -Funktion Folgendes.
+
+```cs
+await GetUserInfo();
+
+IsSignedIn = true;
+```
+
+Fügen Sie am Ende der `SignIn` Funktion Folgendes hinzu.
+
+```cs
+await InitializeGraphClientAsync();
 ```
 
 Aktualisieren Sie nun `GetUserInfo` die-Funktion, um die Benutzer Details aus dem Microsoft Graph abzurufen. Ersetzen Sie die vorhandene `GetUserInfo`-Funktion durch Folgendes.

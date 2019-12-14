@@ -14,7 +14,7 @@ Außerdem sollte Xamarin als Teil Ihrer Visual Studio Installation installiert s
 Optional sollten Sie auch Zugriff auf einen Mac haben, auf dem Visual Studio für Mac installiert ist. Wenn Sie keinen Zugriff haben, können Sie dieses Lernprogramm dennoch ausführen, die IOS-spezifischen Abschnitte jedoch nicht abschließen.
 
 > [!NOTE]
-> Dieses Lernprogramm wurde mit Visual Studio 2019 Version 16.1.0 und Visual Studio für Mac Version 7.7.4 geschrieben. Auf beiden Computern ist die Android SDK-Plattform 28 installiert. Die Schritte in diesem Leitfaden funktionieren möglicherweise mit anderen Versionen, jedoch nicht getestet.
+> Dieses Lernprogramm wurde mit Visual Studio 2019 Version 16.3.10 und Visual Studio für Mac Version 7.7.4 geschrieben. Auf beiden Computern ist die Android SDK-Plattform 28 installiert. Die Schritte in diesem Leitfaden funktionieren möglicherweise mit anderen Versionen, jedoch nicht getestet.
 
 ## <a name="feedback"></a>Feedback
 
