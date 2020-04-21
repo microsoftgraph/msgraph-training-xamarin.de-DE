@@ -1,3 +1,0 @@
-# <a name="completed-module-create-a-xamarin-app"></a>Abgeschlossenes Modul: Erstellen einer Xamarin-App
-
-Die Version des Projekts in diesem Verzeichnis spiegelt das Abschließen des Lernprogramms durch [Erstellen einer Xamarin-App](https://docs.microsoft.com/graph/tutorials/xamarin?tutorial-step=1)wider. Wenn Sie diese Version des Projekts verwenden, müssen Sie den Rest des Lernprogramms ab [Registrieren der APP im Portal](https://docs.microsoft.com/graph/tutorials/xamarin?tutorial-step=2)abschließen.
