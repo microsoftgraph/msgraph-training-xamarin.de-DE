@@ -32,6 +32,10 @@ In dieser Übung integrieren Sie Microsoft Graph in die Anwendung. Für diese An
     using System.ComponentModel;
     ```
 
+1. Fügen Sie der Klasse die folgende Funktion hinzu, um den Beginn der aktuellen Woche in der Zeitzone des `CalendarPage` Benutzers zu erhalten.
+
+    :::code language="csharp" source="../demo/GraphTutorial/GraphTutorial/CalendarPage.xaml.cs" id="GetStartOfWeekSnippet":::
+
 1. Fügen Sie der Klasse die folgende Funktion hinzu, um die Ereignisse des Benutzers zu erhalten und `CalendarPage` die JSON-Antwort anzeigen.
 
     ```csharp
@@ -73,7 +77,7 @@ In dieser Übung integrieren Sie Microsoft Graph in die Anwendung. Für diese An
     - Die URL, die aufgerufen wird, lautet `/v1.0/me/calendarview`.
         - Die `startDateTime` Parameter definieren den Anfang und das Ende der `endDateTime` Kalenderansicht.
         - Der Header bewirkt, dass das Ereignis und die Ereignisse in der Zeitzone des `Prefer: outlook.timezone` `start` Benutzers zurückgegeben `end` werden.
-        - Die Funktion beschränkt die für jedes Ereignis zurückgegebenen Felder auf die Felder, die `Select` tatsächlich von der App verwendet werden.
+        - Die Funktion beschränkt die für jedes Ereignis zurückgegebenen Felder auf die Felder, die `Select` von der App tatsächlich verwendet werden.
         - Die `OrderBy` Funktion sortiert die Ergebnisse nach Startdatum und -uhrzeit.
         - Die `Top` Funktion fordert mindestens 50 Ereignisse an.
 
@@ -111,6 +115,6 @@ Erstellen Sie [](/xamarin/xamarin-forms/xaml/xaml-basics/data-binding-basics#bin
     CalendarList.ItemsSource = events.CurrentPage.ToList();
     ```
 
-1. Führen Sie die App aus, melden Sie sich an, und klicken Sie auf das **Navigationselement** "Kalender". Die Liste der Ereignisse mit den **Start-** und **Endwerten** sollte formatiert sein.
+1. Führen Sie die App aus, melden Sie sich an, und klicken Sie auf das **Navigationselement** "Kalender". Die Liste der Ereignisse sollte mit den **Start-** und **Endwerten** formatiert sein.
 
     ![Ein Screenshot der Tabelle mit Ereignissen](./images/calendar-page.png)
